@@ -2,7 +2,7 @@ package resource
 
 import (
    "fmt"
-   "github.com/newrelic-experimental/newrelic-cloudformation-resource-providers-common/model"
+   "github.com/newrelic/newrelic-cloudformation-resource-providers-common/model"
    log "github.com/sirupsen/logrus"
 )
 
@@ -13,6 +13,24 @@ import (
 type Payload struct {
    model  *Model
    models []interface{}
+}
+
+func (p *Payload) SetIdentifier(g *string) {
+   p.model.Id = g
+}
+
+func (p *Payload) GetIdentifier() *string {
+   return p.model.Id
+}
+
+func (p *Payload) GetIdentifierKey(a model.Action) string {
+   return "id"
+}
+
+var emptyString = ""
+
+func (p *Payload) GetTagIdentifier() *string {
+   return &emptyString
 }
 
 func NewPayload(m *Model) *Payload {
@@ -36,12 +54,10 @@ func (p *Payload) AppendToResourceModels(m model.Model) {
 }
 
 func (p *Payload) GetTags() map[string]string {
-   // return p.model.Tags
    return nil
 }
 
 func (p *Payload) HasTags() bool {
-   // return p.model.Tags != nil
    return false
 }
 
@@ -53,24 +69,11 @@ var typeName = "NewRelic::Observability::AINotificationsDestination"
 
 func (p *Payload) NewModelFromGuid(g interface{}) (m model.Model) {
    s := fmt.Sprintf("%s", g)
-   return NewPayload(&Model{Guid: &s})
+   return NewPayload(&Model{Id: &s})
 }
 
 func (p *Payload) GetGraphQLFragment() *string {
    return p.model.Destination
-}
-
-func (p *Payload) SetGuid(g *string) {
-   p.model.Guid = g
-   log.Debugf("SetGuid: %s", *p.model.Guid)
-}
-
-func (p *Payload) GetGuid() *string {
-   return p.model.Guid
-}
-
-func (p *Payload) GetGuidKey() string {
-   return "id"
 }
 
 func (p *Payload) GetVariables() map[string]string {
@@ -81,8 +84,8 @@ func (p *Payload) GetVariables() map[string]string {
       }
    }
 
-   if p.model.Guid != nil {
-      vars["GUID"] = *p.model.Guid
+   if p.model.Id != nil {
+      vars["ID"] = *p.model.Id
    }
 
    if p.model.Destination != nil {
@@ -106,8 +109,9 @@ func (p *Payload) GetResultKey(a model.Action) string {
    switch a {
    case model.Delete:
       return "ids"
+   default:
+      return "id"
    }
-   return p.GetGuidKey()
 }
 
 func (p *Payload) NeedsPropagationDelay(a model.Action) bool {
@@ -153,7 +157,7 @@ mutation {
 func (p *Payload) GetDeleteMutation() string {
    return `
 mutation {
-  aiNotificationsDeleteDestination(accountId: {{{ACCOUNTID}}}, destinationId: "{{{GUID}}}") {
+  aiNotificationsDeleteDestination(accountId: {{{ACCOUNTID}}}, destinationId: "{{{ID}}}") {
     error {
       description
       details
@@ -168,7 +172,7 @@ mutation {
 func (p *Payload) GetUpdateMutation() string {
    return `
 mutation {
-  aiNotificationsUpdateDestination(accountId: {{{ACCOUNTID}}}, {{{FRAGMENT}}}, destinationId: "{{{GUID}}}") {
+  aiNotificationsUpdateDestination(accountId: {{{ACCOUNTID}}}, {{{FRAGMENT}}}, destinationId: "{{{ID}}}") {
     destination {
       id
       name
@@ -211,7 +215,7 @@ func (p *Payload) GetReadQuery() string {
     actor {
         account(id: {{{ACCOUNTID}}}) {
             aiNotifications {
-                destinations(filters: {id: "{{{GUID}}}"}) {
+                destinations(filters: {id: "{{{ID}}}"}) {
                     entities {
                         id
                         type

@@ -1,12 +1,15 @@
 {
   "typeName": "NewRelic::Observability::AINotificationsDestination",
   "description": "CRUD operations for New Relic AI Notifications Destination via the NerdGraph API",
-  "sourceUrl": "https://github.com/newrelic-experimental/newrelic-cloudformation-resource-providers-ainotificationsdestination.git",
+  "sourceUrl": "https://github.com/newrelic/newrelic-cloudformation-resource-providers-ainotificationsdestination.git",
+  "tagging": {
+    "taggable": false
+  },
   "properties": {
     "Destination": {
       "type": "string"
     },
-    "Guid": {
+    "Id": {
       "type": "string"
     },
     "ListQueryFilter": {
@@ -23,14 +26,14 @@
     }
   },
   "required": [
-    "/properties/Fragment"
+    "Destination"
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
-    "/properties/Guid"
+    "/properties/Id"
   ],
   "readOnlyProperties": [
-    "/properties/Guid"
+    "/properties/Id"
   ],
   "handlers": {
     "create": {

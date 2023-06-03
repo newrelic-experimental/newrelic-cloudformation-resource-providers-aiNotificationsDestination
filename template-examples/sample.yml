@@ -5,7 +5,7 @@ Resources:
     Type: 'NewRelic::Observability::AINotificationsDestination'
     Properties:
       Destination: >-
-        destination: {name: "Notification email test", properties: {key: "email", value: "msummers@newrelic.com"}, type: EMAIL}
+        destination: {name: "Email destination test", properties: {key: "email", value: "someone@somewhere.com"}, type: EMAIL}
 Outputs:
   CustomResourceAttribute1:
-    Value: !GetAtt  Resource1.Guid
+    Value: !GetAtt  Resource1.Id
